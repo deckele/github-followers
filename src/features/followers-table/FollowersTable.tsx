@@ -5,14 +5,14 @@ import {
   SortingState,
   IntegratedSorting,
   FilteringState,
-  IntegratedFiltering
+  IntegratedFiltering,
 } from "@devexpress/dx-react-grid";
 import {
   Grid,
   Table,
   TableHeaderRow,
   TableFilterRow,
-  PagingPanel
+  PagingPanel,
 } from "@devexpress/dx-react-grid-material-ui";
 import "./followers-table.css";
 import { useGetUserQuery, useGetFollowersQuery } from "../api/api-slice";
@@ -30,14 +30,19 @@ import {
   setPageSize,
   setSorting,
   setFilters,
-  setUsernameSearch
+  setUsernameSearch,
 } from "./followers-table-slice";
 import { useSelector, useDispatch } from "react-redux";
+declare module "@devexpress/dx-react-grid-material-ui" {
+  export interface GridProps {
+    children?: React.ReactNode;
+  }
+}
 
 const PAGE_SIZES = [30, 50, 80, 100];
 const COLUMNS = [
   { name: "username", title: "Follower User Name" },
-  { name: "id", title: "ID" }
+  { name: "id", title: "ID" },
 ];
 
 export default () => {
@@ -51,14 +56,12 @@ export default () => {
   const debouncedUsername = useDebounce(username, 600);
 
   const { data: user } = useGetUserQuery(debouncedUsername || skipToken);
-  const {
-    data: followers,
-    isLoading: areFollowersLoading
-  } = useGetFollowersQuery(
-    debouncedUsername && user
-      ? { username, currentPage: currentPage + 1, pageSize } // currentPage + 1 because table page is zero based, and github api is one based
-      : skipToken
-  );
+  const { data: followers, isLoading: areFollowersLoading } =
+    useGetFollowersQuery(
+      debouncedUsername && user
+        ? { username, currentPage: currentPage + 1, pageSize } // currentPage + 1 because table page is zero based, and github api is one based
+        : skipToken
+    );
 
   return (
     <Paper sx={{ p: 2 }}>
